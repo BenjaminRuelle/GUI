@@ -36,7 +36,7 @@
  * 28-Mar-2002 : Version 1 (DG);
  *
  */
-
+package UnitTest;
  import java.awt.BorderLayout;
  import java.awt.event.ActionEvent;
  import java.awt.event.ActionListener;

@@ -214,13 +214,13 @@ public class HomeFrame extends JFrame implements ActionListener{
         }
         if (e.getActionCommand().equals("ADD_DATA")) {
             DecimalFormat d = new DecimalFormat("0.00");
-            
+
             double tension = 11 + Math.random()*2; //simulation of 12v
             double current = Math.random()*100; //simulation of 0;100 mA
             double speed = current * 21;
             double power = tension*(current/100);
             this.series.add(new Millisecond(), power);
-            speedValue.setText(d.format(speed)  + " tr.min");
+            speedValue.setText(Math.round(speed)  + " tr.min");
             currentValue.setText(d.format(current) + "mA");
             tensionValue.setText(d.format(tension) + "V");
             console.append("["+new Timestamp(System.currentTimeMillis())+"] Add +" + d.format(power) +" on chart \n");
