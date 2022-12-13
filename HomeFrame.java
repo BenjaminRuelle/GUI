@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Timestamp;
 import java.lang.Math;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 import org.jfree.chart.ChartFactory;
@@ -65,12 +64,15 @@ public class HomeFrame extends JFrame implements ActionListener{
     JScrollPane scroll = new JScrollPane(console); 
     private TimeSeries series;   
 
-
+    int delay = 1000;    
+    Timer timer = new Timer(delay, null);
+    boolean timerState = false;
     //Class constructor
     HomeFrame(){
         console.setEditable(true);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS ); 
 
+        setTimer();
         //set color  
         setColor();        
         //Position of dataPanel
@@ -158,13 +160,14 @@ public class HomeFrame extends JFrame implements ActionListener{
      clutch1Button.addActionListener(this);        
      clutch2Button.addActionListener(this);
      modeButton.addActionListener(this); 
+     
     }
 
     public void addComponents(){
      //Adding each components to the dataGrid
      
-     mode.add("Auto");
      mode.add("Manual");
+     mode.add("Auto");
      //modeRow.add(modeButton,BorderLayout.EAST);
      //modeRow.add(mode,BorderLayout.WEST);
          
@@ -192,26 +195,30 @@ public class HomeFrame extends JFrame implements ActionListener{
     }
 
     public void actionPerformed(ActionEvent e) {
+                
         //Coding Part of clutch1Button
         if (e.getSource() == clutch1Button) {           
-            console.append("["+new Timestamp(System.currentTimeMillis())+"] clutch 1 "+clutch1Button.isSelected()+"\n");
+            console.append("["+new Timestamp(System.currentTimeMillis())+"] Clutch 1 [State]: "+clutch1Button.isSelected()+"\n");
         }        
        //Coding Part of clutch1Button
         if (e.getSource() == clutch2Button) {
-            console.append("["+new Timestamp(System.currentTimeMillis())+"] clutch 2 "+clutch2Button.isSelected()+"\n");
+            console.append("["+new Timestamp(System.currentTimeMillis())+"] Clutch 2 [State]: "+clutch2Button.isSelected()+"\n");
         }
         //Coding Part of modeButton
         if (e.getSource() == modeButton) {
-            console.append("["+new Timestamp(System.currentTimeMillis())+"] Mode: "+ mode.getSelectedItem()+"\n");
+            console.append("["+new Timestamp(System.currentTimeMillis())+"] Selected mode: "+ mode.getSelectedItem()+"\n");
             if(mode.getSelectedItem()=="Auto"){
                 clutch1Button.setEnabled(false);
                 clutch2Button.setEnabled(false);
+                timerState = true;
             }
             if(mode.getSelectedItem()=="Manual"){
                 clutch1Button.setEnabled(true);
                 clutch2Button.setEnabled(true);
+                timerState = false;
             }
         }
+        //Coding Part of graph
         if (e.getActionCommand().equals("ADD_DATA")) {
             DecimalFormat d = new DecimalFormat("0.00");
 
@@ -225,7 +232,31 @@ public class HomeFrame extends JFrame implements ActionListener{
             tensionValue.setText(d.format(tension) + "V");
             console.append("["+new Timestamp(System.currentTimeMillis())+"] Add +" + d.format(power) +" on chart \n");
         }   
-    }   
+    }
+   
+    public void setTimer(){
+        final Timer timer = new Timer(1000, null);
+        final ActionListener listener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {                
+                if(timerState == true){
+                    console.append("["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n");
+                    updateData(Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected()).split("/"));
+                }                
+            }
+        };
+        timer.addActionListener(listener);
+        timer.start();        
+    }
+    
+    public void updateData(String[] data){
+        speedValue.setText(data[4]  + " tr.min");
+        currentValue.setText(data[5] + "mA");
+        tensionValue.setText(data[6] + "V");
+        double y = Double.parseDouble(data[6])*(Double.parseDouble(data[5])/100);
+        this.series.add(new Millisecond(), y);
+    }
+
  public static void main(String[] a){
         //Creating object of HomeFrame class and setting some of its properties
         
@@ -235,12 +266,10 @@ public class HomeFrame extends JFrame implements ActionListener{
         frame.setUndecorated(false);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);            
+        frame.setResizable(false);                    
         frame.setIconImage(Toolkit.getDefaultToolkit().
-         getImage(HomeFrame.class.getResource("/images/Icon.png")));  
-            
+         getImage(HomeFrame.class.getResource("/images/Icon.png")));     
         }
-    
     
      
 }
