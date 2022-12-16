@@ -6,6 +6,10 @@ import java.sql.Timestamp;
 import java.lang.Math;
 import java.text.DecimalFormat;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -16,7 +20,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
-public class HomeFrame extends JFrame implements ActionListener{
+public class HomeFrame extends JFrame implements ActionListener {
     
     /**
                  * Expected layout:
@@ -67,11 +71,14 @@ public class HomeFrame extends JFrame implements ActionListener{
     int delay = 1000;    
     Timer timer = new Timer(delay, null);
     boolean timerState = false;
+    String dataComplete;
+    Path fileName = Path.of("/Users/bruelle/Documents/GUI/data.csv");
+
     //Class constructor
     HomeFrame(){
         console.setEditable(true);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS ); 
-
+        
         setTimer();
         //set color  
         setColor();        
@@ -197,7 +204,8 @@ public class HomeFrame extends JFrame implements ActionListener{
     public void actionPerformed(ActionEvent e) {
                 
         //Coding Part of clutch1Button
-        if (e.getSource() == clutch1Button) {           
+        if (e.getSource() == clutch1Button) {
+                                
             console.append("["+new Timestamp(System.currentTimeMillis())+"] Clutch 1 [State]: "+clutch1Button.isSelected()+"\n");
         }        
        //Coding Part of clutch1Button
@@ -240,14 +248,22 @@ public class HomeFrame extends JFrame implements ActionListener{
             @Override
             public void actionPerformed(ActionEvent e) {                
                 if(timerState == true){
-                    console.append("["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n");
-                    updateData(Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected()).split("/"));
+                    dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
+                    console.append(dataComplete);
+                    
+                    updateData(Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected()).split(";"));
                 }                
             }
         };
         timer.addActionListener(listener);
         timer.start();        
     }
+
+    public void savetoCSV(){
+			
+		Files.writeString(fileName, dataComplete, StandardOpenOption.APPEND);
+		
+	}
     
     public void updateData(String[] data){
         speedValue.setText(data[4]  + " tr.min");
@@ -255,11 +271,12 @@ public class HomeFrame extends JFrame implements ActionListener{
         tensionValue.setText(data[6] + "V");
         double y = Double.parseDouble(data[6])*(Double.parseDouble(data[5])/100);
         this.series.add(new Millisecond(), y);
+        
+        
     }
 
  public static void main(String[] a){
         //Creating object of HomeFrame class and setting some of its properties
-        
         HomeFrame frame = new HomeFrame();                 
         frame.setTitle("Home BATT_V0.2");         
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
@@ -267,9 +284,7 @@ public class HomeFrame extends JFrame implements ActionListener{
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);                    
-        frame.setIconImage(Toolkit.getDefaultToolkit().
-         getImage(HomeFrame.class.getResource("/images/Icon.png")));     
+        frame.setIconImage(Toolkit.getDefaultToolkit().getImage(HomeFrame.class.getResource("/images/Icon.png")));     
         }
-    
-     
+        
 }

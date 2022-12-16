@@ -12,14 +12,14 @@ public class Simulation {
         double current = Math.random()*100; //simulation of 0;100 mA
         double speed = current * 21;      
 
-        String trame = System.currentTimeMillis() + KeyID +"/"+ Mode +"/"+ clutch1  + "/"+ clutch2  + "/"+ d.format(speed) +"/"+ d.format(current) +"/"+ d.format(tension);
+        String trame = System.currentTimeMillis() + KeyID +";"+ Mode +";"+ clutch1  + ";"+ clutch2  + ";"+ d.format(speed) +";"+ d.format(current) +";"+ d.format(tension);
         return trame;
     } 
     
    
     public static void main(String[] a){
         System.out.println(SimulationTrame("Auto", true, true));
-        String[] splited = SimulationTrame("Auto",true,true).split("/");
-        System.out.println(splited[1]);
+        //String[] splited = SimulationTrame("Auto",true,true).split(";");
+        //System.out.println(splited[1]);
     }
 }
