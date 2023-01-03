@@ -6,9 +6,6 @@ import java.sql.Timestamp;
 import java.lang.Math;
 import java.text.DecimalFormat;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -72,8 +69,7 @@ public class HomeFrame extends JFrame implements ActionListener {
     Timer timer = new Timer(delay, null);
     boolean timerState = false;
     String dataComplete;
-    Path fileName = Path.of("/Users/bruelle/Documents/GUI/data.csv");
-
+   
     //Class constructor
     HomeFrame(){
         console.setEditable(true);
@@ -257,13 +253,7 @@ public class HomeFrame extends JFrame implements ActionListener {
         };
         timer.addActionListener(listener);
         timer.start();        
-    }
-
-    public void savetoCSV(){
-			
-		Files.writeString(fileName, dataComplete, StandardOpenOption.APPEND);
-		
-	}
+    }    
     
     public void updateData(String[] data){
         speedValue.setText(data[4]  + " tr.min");
