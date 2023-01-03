@@ -1,31 +1,44 @@
-// Importing required classes
+import java.io.File;  // Import the File class
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.lang.Math;
+import java.text.DecimalFormat;
+import java.util.*;
 
-// Main class
-public class data {
-	Path fileName = Path.of("/Users/bruelle/Documents/GUI/data.csv");
 
-	public void savetoCSV(String row)throws IOException {
-			
-		Files.writeString(fileName, row, StandardOpenOption.APPEND);
-		
-	}
-	// Main driver method
-	public static void main(String[] args)throws IOException
-	{
-		// Assigning the content of the file
-		String text = Simulation.SimulationTrame("Auto",true,true)+"\n";
-		// Defining the file name of the file
-		Path fileName = Path.of("/Users/bruelle/Documents/GUI/data.csv");
-		// Writing into the file
-		Files.writeString(fileName, text, StandardOpenOption.APPEND);
-		// Reading the content of the file
-		String file_content = Files.readString(fileName);
-		// Printing the content inside the file
-		System.out.println(file_content);
+public class Data{  
 
-	}
+  public static void savetoCSV(String row) {
+    String urlFile = "/Users/bruelle/Documents/GUI/data.csv";
+    Path fileName = Path.of(urlFile);
+    try {
+      File myObj = new File(urlFile);
+
+      if (myObj.createNewFile()) {
+        System.out.println("File created: " + myObj.getName());
+      } 
+      Files.writeString(fileName, row, StandardOpenOption.APPEND); //Write inside the csv file the "row" function parameter 
+    } catch (IOException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
+  }
+
+  static public String SimulationTrame(String Mode, boolean clutch1, boolean clutch2){
+    Locale.setDefault(new Locale("en", "US"));
+    DecimalFormat d = new DecimalFormat("0.00");
+    String KeyID = "001";           
+    double tension = 11 + Math.random()*2; //simulation of 12v
+    double current = Math.random()*100; //simulation of 0;100 mA
+    double speed = current * 21;      
+
+    String trame = System.currentTimeMillis() + KeyID +";"+ Mode +";"+ clutch1  + ";"+ clutch2  + ";"+ d.format(speed) +";"+ d.format(current) +";"+ d.format(tension);
+    return trame;
+} 
+
+  public static void main(String[] args) {
+    savetoCSV(SimulationTrame(null, false, false));
+    }
 }

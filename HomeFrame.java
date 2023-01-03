@@ -17,6 +17,8 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
+import UnitTest.Simulation;
+
 public class HomeFrame extends JFrame implements ActionListener {
     
     /**
@@ -72,32 +74,32 @@ public class HomeFrame extends JFrame implements ActionListener {
    
     //Class constructor
     HomeFrame(){
-        console.setEditable(true);
-        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS ); 
+    console.setEditable(true);
+    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS ); 
+       
+    setTimer();
+    //set color  
+    setColor();        
+    //Position of dataPanel
+    setPosition();
+    //Adding components
+    addComponents();
+    //Adding action
+    addActionEvent();           
+    //Adding button in middPanel
+    middPanel.add(mode);
+    middPanel.add(modeButton);
+    //Creation of Graph
+    initGraph();
+    //Adding Graph and dataPanel to Midd Panel
+    middPanel.add(graphPanel); 
+    middPanel.add(dataPanel);   
+    //Adding Panels to MasterPanel        
+    masterPanel.add(middPanel);
+    masterPanel.add(consolPanel,BorderLayout.PAGE_END);  
         
-        setTimer();
-        //set color  
-        setColor();        
-        //Position of dataPanel
-        setPosition();
-        //Adding components
-        addComponents();
-        //Adding action
-        addActionEvent();           
-        //Adding button in middPanel
-        middPanel.add(mode);
-        middPanel.add(modeButton);
-        //Creation of Graph
-        initGraph();
-        //Adding Graph and dataPanel to Midd Panel
-        middPanel.add(graphPanel); 
-        middPanel.add(dataPanel);   
-        //Adding Panels to MasterPanel        
-        masterPanel.add(middPanel);
-        masterPanel.add(consolPanel,BorderLayout.PAGE_END);  
-
-        Container container=getContentPane(); //Trick pour pouvoir instancier dans la class main
-        container.add(masterPanel);        
+    Container container=getContentPane(); //Trick pour pouvoir instancier dans la class main
+    container.add(masterPanel);        
     }
 
     public void initGraph()
@@ -246,7 +248,7 @@ public class HomeFrame extends JFrame implements ActionListener {
                 if(timerState == true){
                     dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
                     console.append(dataComplete);
-                    
+                    Data.savetoCSV(dataComplete);                    
                     updateData(Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected()).split(";"));
                 }                
             }
@@ -255,7 +257,7 @@ public class HomeFrame extends JFrame implements ActionListener {
         timer.start();        
     }    
     
-    public void updateData(String[] data){
+    public void updateData(String[] data){ //Update Graph and labels
         speedValue.setText(data[4]  + " tr.min");
         currentValue.setText(data[5] + "mA");
         tensionValue.setText(data[6] + "V");
