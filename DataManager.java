@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 
-public class Data{  
+public class DataManager{  
 
   public static void savetoCSV(String row) {
     String urlFile = "/Users/bruelle/Documents/GUI/data.csv";

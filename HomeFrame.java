@@ -36,8 +36,7 @@ public class HomeFrame extends JFrame implements ActionListener {
                  * ******************************** 
                  */
         
-    //Initalisation of Panels
-        
+    //Initalisation of Panels        
     JPanel dataPanel = new JPanel(new BorderLayout());   // Panel for data
     JPanel consolPanel = new JPanel(new BorderLayout());   // Panel for consol
     JPanel masterPanel = new JPanel(new BorderLayout());   // Panel wgich containt data + console + graph
@@ -55,7 +54,7 @@ public class HomeFrame extends JFrame implements ActionListener {
     JButton modeButton=new JButton("Select mode");  
     JLabel dataPanelLabel = new JLabel("Live Data Window");
     JToggleButton clutch1Button=new JToggleButton("Clutch 1", false);  //False = off or non-geared
-    JToggleButton clutch2Button=new JToggleButton("Clutch 2",false);  
+    JToggleButton clutch2Button=new JToggleButton("Clutch 2",false);  //False = off or non-geared
     JLabel speedLabel=new JLabel("    Rotation speed (tr.min): ");
     JLabel speedValue=new JLabel("000 tr.min"); 
     JLabel tensionLabel=new JLabel("    Output tension (V): ");
@@ -65,10 +64,9 @@ public class HomeFrame extends JFrame implements ActionListener {
     JTextArea console = new JTextArea( 10, 135);
     JLabel consoleLabel = new JLabel("Console");
     JScrollPane scroll = new JScrollPane(console); 
-    private TimeSeries series;   
-
-    int delay = 1000;    
-    Timer timer = new Timer(delay, null);
+    private TimeSeries series; 
+   
+    Timer timer = new Timer(1000, null);
     boolean timerState = false;
     String dataComplete;
    
@@ -113,10 +111,10 @@ public class HomeFrame extends JFrame implements ActionListener {
         button.setActionCommand("ADD_DATA");
         button.addActionListener(this);        
         graphPanel.add(chartPanel);
-        graphPanel.add(button, BorderLayout.SOUTH);  
+        //graphPanel.add(button, BorderLayout.SOUTH); 
     }
     
-    private JFreeChart createChart(XYDataset dataset) {
+    public JFreeChart createChart(XYDataset dataset) {
         JFreeChart result = ChartFactory.createTimeSeriesChart(
             "Output power", 
             "Time", 
@@ -164,8 +162,7 @@ public class HomeFrame extends JFrame implements ActionListener {
      //adding Action listener to components
      clutch1Button.addActionListener(this);        
      clutch2Button.addActionListener(this);
-     modeButton.addActionListener(this); 
-     
+     modeButton.addActionListener(this);      
     }
 
     public void addComponents(){
@@ -203,7 +200,7 @@ public class HomeFrame extends JFrame implements ActionListener {
                 
         //Coding Part of clutch1Button
         if (e.getSource() == clutch1Button) {
-                                
+            //console.append write on the console text area               
             console.append("["+new Timestamp(System.currentTimeMillis())+"] Clutch 1 [State]: "+clutch1Button.isSelected()+"\n");
         }        
        //Coding Part of clutch1Button
@@ -216,7 +213,7 @@ public class HomeFrame extends JFrame implements ActionListener {
             if(mode.getSelectedItem()=="Auto"){
                 clutch1Button.setEnabled(false);
                 clutch2Button.setEnabled(false);
-                timerState = true;
+                timerState = true; //Allow the timer for automatic mode (see setTimer())
             }
             if(mode.getSelectedItem()=="Manual"){
                 clutch1Button.setEnabled(true);
@@ -248,7 +245,7 @@ public class HomeFrame extends JFrame implements ActionListener {
                 if(timerState == true){
                     dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
                     console.append(dataComplete);
-                    Data.savetoCSV(dataComplete);                    
+                    DataManager.savetoCSV(dataComplete);  //save data in data.csv with this function              
                     updateData(Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected()).split(";"));
                 }                
             }
@@ -270,7 +267,7 @@ public class HomeFrame extends JFrame implements ActionListener {
  public static void main(String[] a){
         //Creating object of HomeFrame class and setting some of its properties
         HomeFrame frame = new HomeFrame();                 
-        frame.setTitle("Home BATT_V0.2");         
+        frame.setTitle("Home BATT_V1.0");         
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
         frame.setUndecorated(false);
         frame.setVisible(true);
