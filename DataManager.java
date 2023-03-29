@@ -38,7 +38,7 @@ public class DataManager{
     return trame;
 } 
 
-  public static void main(String[] args) {
-    savetoCSV(SimulationTrame(null, false, false));
-    }
+public static void main(String[] args) {
+  savetoCSV(SimulationTrame(null, false, false));
+  }
 }
