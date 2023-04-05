@@ -11,7 +11,7 @@ import java.util.*;
 public class DataManager{  
 
   public static void savetoCSV(String row) {
-    String urlFile = "/Users/bruelle/Documents/GUI/data.csv";
+    String urlFile = "data.csv";
     Path fileName = Path.of(urlFile);
     try {
       File myObj = new File(urlFile);

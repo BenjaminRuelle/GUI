@@ -2,10 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serial;
 import java.sql.Timestamp;
 import java.lang.Math;
 import java.text.DecimalFormat;
-
+import java.util.Scanner;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -17,10 +18,15 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
+import UnitTest.SerialCom;
 import UnitTest.Simulation;
+
+import java.io.InputStream;
+import com.fazecast.jSerialComm.SerialPort;
 
 public class HomeFrame extends JFrame implements ActionListener {
     
+
     /**
                  * Expected layout:
                  * ******************************** 
@@ -73,8 +79,7 @@ public class HomeFrame extends JFrame implements ActionListener {
     //Class constructor
     HomeFrame(){
     console.setEditable(true);
-    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS ); 
-       
+    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );       
     setTimer();
     //set color  
     setColor();        
@@ -243,10 +248,17 @@ public class HomeFrame extends JFrame implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {                
                 if(timerState == true){
-                    dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
+                    //This follow dataComplte use SimulationTrame, you can use it when you don't have a Arduino pluged
+                    //dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
+                    //This follow dataComplete use SerialCom function to read arduino input
+
+                    String input = SerialCom.Read(scanner); // !! Change Serial port here
+                    dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+ System.currentTimeMillis() +";"+ mode.getSelectedItem() +";"+ clutch1Button.isSelected() +";"+ clutch2Button.isSelected() +";"+ input.split(";")[0] +";"+ input.split(";")[1] +";"+ input.split(";")[2]+"\n";
                     console.append(dataComplete);
-                    DataManager.savetoCSV(dataComplete);  //save data in data.csv with this function              
+                    DataManager.savetoCSV(dataComplete);  //save data in data.csv with this function           
+                    
                     updateData(Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected()).split(";"));
+                    
                 }                
             }
         };
@@ -254,7 +266,8 @@ public class HomeFrame extends JFrame implements ActionListener {
         timer.start();        
     }    
     
-    public void updateData(String[] data){ //Update Graph and labels
+    public void updateData(String[] data){ //Update Graph and labels     
+
         speedValue.setText(data[4]  + " tr.min");
         currentValue.setText(data[5] + "mA");
         tensionValue.setText(data[6] + "V");
@@ -265,6 +278,8 @@ public class HomeFrame extends JFrame implements ActionListener {
     }
 
  public static void main(String[] a){
+
+
         //Creating object of HomeFrame class and setting some of its properties
         HomeFrame frame = new HomeFrame();                 
         frame.setTitle("Home BATT_V1.0");         
