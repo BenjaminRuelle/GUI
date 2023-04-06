@@ -2,7 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serial;
 import java.sql.Timestamp;
 import java.lang.Math;
 import java.text.DecimalFormat;
@@ -17,10 +16,7 @@ import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
-
 import UnitTest.SerialCom;
-import UnitTest.Simulation;
-
 import java.io.InputStream;
 import com.fazecast.jSerialComm.SerialPort;
 
@@ -104,7 +100,7 @@ public class HomeFrame extends JFrame implements ActionListener {
         container.add(masterPanel);
     }
 
-    public void initGraph() {
+    public void initGraph() { // Set action and update of data for graph
         this.series = new TimeSeries("Random Data", Millisecond.class);
         TimeSeriesCollection dataset = new TimeSeriesCollection(this.series);
         JFreeChart chart = createChart(dataset);
@@ -117,7 +113,7 @@ public class HomeFrame extends JFrame implements ActionListener {
         // graphPanel.add(button, BorderLayout.SOUTH);
     }
 
-    public JFreeChart createChart(XYDataset dataset) {
+    public JFreeChart createChart(XYDataset dataset) { // Creation and setup of graph
         JFreeChart result = ChartFactory.createTimeSeriesChart(
                 "Output power",
                 "Time",
@@ -135,7 +131,7 @@ public class HomeFrame extends JFrame implements ActionListener {
         return result;
     }
 
-    public void setColor() {
+    public void setColor() { // Color setup for all panel
         console.setBackground(Color.BLACK);
         console.setForeground(Color.white);
         consolPanel.setBackground(Color.LIGHT_GRAY);
@@ -149,7 +145,7 @@ public class HomeFrame extends JFrame implements ActionListener {
 
     }
 
-    public void setPosition() {
+    public void setPosition() { // Positio, setup for middPanel
         middPanel.setLayout(null);
         dataPanel.setBounds(750, 80, 350, 300);
         graphPanel.setBounds(10, 40, 600, 400);
@@ -157,15 +153,14 @@ public class HomeFrame extends JFrame implements ActionListener {
         modeButton.setBounds(650, 2, 150, 30);
     }
 
-    public void addActionEvent() {
+    public void addActionEvent() { // Link action and button
         // adding Action listener to components
         clutch1Button.addActionListener(this);
         clutch2Button.addActionListener(this);
         modeButton.addActionListener(this);
     }
 
-    public void addComponents() {
-        // Adding each components to the dataGrid
+    public void addComponents() { // Adding each components to the dataGrid
 
         mode.add("Manual");
         mode.add("Auto");
@@ -195,7 +190,7 @@ public class HomeFrame extends JFrame implements ActionListener {
 
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) { // Define action for each source
 
         // Coding Part of clutch1Button
         if (e.getSource() == clutch1Button) {
@@ -240,7 +235,7 @@ public class HomeFrame extends JFrame implements ActionListener {
         }
     }
 
-    public void setTimer() {
+    public void setTimer() { // Timer event and read data
         final Timer timer = new Timer(1000, null);
         final ActionListener listener = new ActionListener() {
             @Override
@@ -248,39 +243,40 @@ public class HomeFrame extends JFrame implements ActionListener {
                 if (timerState == true) {
                     // This follow dataComplte use SimulationTrame, you can use it when you don't
                     // have a Arduino pluged
+
                     // dataComplete = "["+new
                     // Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(),
                     // clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
 
                     // This follow dataComplete use SerialCom function to read arduino input
-                    String input = SerialCom.Read(); // Change Serial port here
+                    String input = SerialCom.Read();
                     dataComplete = "[" + new Timestamp(System.currentTimeMillis()) + "]" + System.currentTimeMillis()
                             + ";" + mode.getSelectedItem() + ";" + clutch1Button.isSelected() + ";"
                             + clutch2Button.isSelected() + ";" + input.split(";")[0] + ";" + input.split(";")[1] + ";"
                             + input.split(";")[2] + "\n";
                     console.append(dataComplete);
                     DataManager.savetoCSV(dataComplete); // save data in data.csv with this function
-                    updateData(input); //We use input string readed on SerialCom
+                    updateData(input); // We use input string readed on SerialCom
                 }
             }
         };
-        timer.addActionListener(listener);
+        timer.addActionListener(listener); // Link action and timer. Each tic of timer can be see as a button press
         timer.start();
     }
 
     public void updateData(String data) { // Update Graph and labels
-        if(data.split(";").length == 3){              
-         speedValue.setText(data.split(";")[2] + "tr.min");
-         currentValue.setText(data.split(";")[1] + "mA");
-         tensionValue.setText(data.split(";")[0] + "V");
-         double y = Double.parseDouble(data.split(";")[0]) * (Double.parseDouble(data.split(";")[1]) / 100);
-         this.series.add(new Millisecond(), y);     
-     }
-     
+        if (data.split(";").length == 3) {
+            speedValue.setText(data.split(";")[2] + "tr.min");
+            currentValue.setText(data.split(";")[1] + "mA");
+            tensionValue.setText(data.split(";")[0] + "V");
+            double y = Double.parseDouble(data.split(";")[0]) * (Double.parseDouble(data.split(";")[1]) / 100);
+            this.series.add(new Millisecond(), y);
+        }
+
     }
 
-    public static void setupSerialCom() {
-        SerialPort port = SerialPort.getCommPort("COM20"); // replace with your port name
+    public static void setupSerialCom() { // Setup for serialCom
+        SerialPort port = SerialPort.getCommPort("COM20"); // replace with your port name (check on device manager)
         port.setBaudRate(9600);
         port.openPort();
         InputStream inputStream = port.getInputStream();
@@ -292,7 +288,6 @@ public class HomeFrame extends JFrame implements ActionListener {
     }
 
     public static void main(String[] a) {
-
         setupSerialCom();
         // Creating object of HomeFrame class and setting some of its properties
         HomeFrame frame = new HomeFrame();
