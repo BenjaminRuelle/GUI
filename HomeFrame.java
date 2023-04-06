@@ -250,9 +250,9 @@ public class HomeFrame extends JFrame implements ActionListener {
                 if(timerState == true){
                     //This follow dataComplte use SimulationTrame, you can use it when you don't have a Arduino pluged
                     //dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+Simulation.SimulationTrame(mode.getSelectedItem(), clutch1Button.isSelected(),clutch2Button.isSelected())+"\n";
+                    
                     //This follow dataComplete use SerialCom function to read arduino input
-
-                    String input = SerialCom.Read(scanner); // !! Change Serial port here
+                    String input = SerialCom.Read(); // !! Change Serial port here
                     dataComplete = "["+new Timestamp(System.currentTimeMillis())+"]"+ System.currentTimeMillis() +";"+ mode.getSelectedItem() +";"+ clutch1Button.isSelected() +";"+ clutch2Button.isSelected() +";"+ input.split(";")[0] +";"+ input.split(";")[1] +";"+ input.split(";")[2]+"\n";
                     console.append(dataComplete);
                     DataManager.savetoCSV(dataComplete);  //save data in data.csv with this function           
@@ -273,13 +273,24 @@ public class HomeFrame extends JFrame implements ActionListener {
         tensionValue.setText(data[6] + "V");
         double y = Double.parseDouble(data[6])*(Double.parseDouble(data[5])/100);
         this.series.add(new Millisecond(), y);
-        
+      
         
     }
 
+    public static void setupSerialCom(){
+        SerialPort port = SerialPort.getCommPort("COM20"); // replace with your port name
+        port.setBaudRate(9600);
+        port.openPort();
+        InputStream inputStream = port.getInputStream();
+        Scanner scanner = new Scanner(inputStream);
+
+        SerialCom serialCom = new SerialCom(); // création d'une instance de la classe SerialCom
+        serialCom.scanner = scanner; // assignation de la variable scanner à la variable membre scanner de l'instance de la classe
+    }
+
  public static void main(String[] a){
-
-
+    
+        setupSerialCom();
         //Creating object of HomeFrame class and setting some of its properties
         HomeFrame frame = new HomeFrame();                 
         frame.setTitle("Home BATT_V1.0");         
