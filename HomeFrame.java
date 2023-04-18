@@ -3,8 +3,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Timestamp;
-import java.lang.Math;
-import java.text.DecimalFormat;
 import java.util.Scanner;
 
 import org.jfree.chart.ChartFactory;
@@ -66,6 +64,7 @@ public class HomeFrame extends JFrame implements ActionListener {
     JLabel consoleLabel = new JLabel("Console");
     JScrollPane scroll = new JScrollPane(console);
     private TimeSeries series;
+    public String data;
 
     Timer timer = new Timer(1000, null);
     boolean timerState = false;
@@ -218,21 +217,6 @@ public class HomeFrame extends JFrame implements ActionListener {
                 timerState = false;
             }
         }
-        // Coding Part of graph
-        if (e.getActionCommand().equals("ADD_DATA")) {
-            DecimalFormat d = new DecimalFormat("0.00");
-
-            double tension = 11 + Math.random() * 2; // simulation of 12v
-            double current = Math.random() * 100; // simulation of 0;100 mA
-            double speed = current * 21;
-            double power = tension * (current / 100);
-            this.series.add(new Millisecond(), power);
-            speedValue.setText(Math.round(speed) + " tr.min");
-            currentValue.setText(d.format(current) + "mA");
-            tensionValue.setText(d.format(tension) + "V");
-            console.append(
-                    "[" + new Timestamp(System.currentTimeMillis()) + "] Add +" + d.format(power) + " on chart \n");
-        }
     }
 
     public void setTimer() { // Timer event and read data
@@ -256,7 +240,9 @@ public class HomeFrame extends JFrame implements ActionListener {
                             + input.split(";")[2] + "\n";
                     console.append(dataComplete);
                     DataManager.savetoCSV(dataComplete); // save data in data.csv with this function
-                    updateData(input); // We use input string readed on SerialCom
+                    if (input != "None;None;None") { // Check if battery système is plugged
+                        updateData(input); // We use input string readed on SerialCom
+                    }
                 }
             }
         };
